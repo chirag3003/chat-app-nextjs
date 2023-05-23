@@ -35,9 +35,9 @@ const Button: FC<ButtonProps> = ({
     children,
     ...props
 }) => {
-    console.log(buttonVariance({variant,size,className}))
     return <button className={cn(buttonVariance({variant, size, className}))} disabled={isLoading} {...props}>
-        {isLoading? <Loader2 className={"mr-2 h-4 w-4 animate-spin "} />:children}
+        {isLoading? <Loader2 className={"mr-2 h-4 w-4 animate-spin "} />:null}
+        {children}
     </button>
 }
 
