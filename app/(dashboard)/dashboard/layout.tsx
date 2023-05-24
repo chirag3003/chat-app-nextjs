@@ -7,6 +7,9 @@ import {Icon, Icons} from "@/components/Icons";
 import SignOutButton from "@/components/SignOutButton";
 import Image from "next/image";
 import {RedirectType} from "next/dist/client/components/redirect";
+import FriendRequestSidebarOption from "@/components/FriendRequestSidebarOption";
+import {fetchRedis} from "@/helpers/redis";
+import {UserId} from "@/types/next-auth";
 
 interface LayoutProps {
     children: ReactNode,
@@ -32,6 +35,9 @@ const Layout = async ({children}: LayoutProps) => {
     if (!session) {
         redirect("/login", RedirectType.replace)
     }
+
+    const unseenRequestCount =(( await fetchRedis("smembers",`user:${session.user.id}:incoming_friend_requests`)) as UserId[]).length
+    console.log(unseenRequestCount)
 
     return (
         <div className={'w-full flex h-screen'}>
@@ -66,6 +72,9 @@ const Layout = async ({children}: LayoutProps) => {
                                     )
                                 })}
                             </ul>
+                        </li>
+                        <li>
+                            <FriendRequestSidebarOption sessionId={session.user.id} initialUnseenRequestCount={unseenRequestCount}/>
                         </li>
                         <li className='absolute overflow-hidden left-0 right-0 bottom-0 max-w-sm mt-auto flex items-center py-3 px-6'>
                             <div
