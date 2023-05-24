@@ -5,9 +5,9 @@ import {getServerSession} from "next-auth";
 async function Page() {
     const session =await getServerSession(authOptions)
     return (
-        <pre>
+        <div className={"w-full"}>
             {JSON.stringify(session)}
-        </pre>
+        </div>
     );
 }
 

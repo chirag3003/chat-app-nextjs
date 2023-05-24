@@ -3,7 +3,7 @@ import AddFriendButton from "@/components/AddFriendButton";
 
 const Page:FC = () => {
     return (
-        <main className={'pt-8'}>
+        <main className={'p-8'}>
             <h1 className={"font-bold mb-8 text-5xl"}>
                 Add a friend
             </h1>
