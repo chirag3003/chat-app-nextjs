@@ -37,7 +37,7 @@ const AddFriendButton: React.FC<AddFriendButtonProps> = function () {
             await axios.post('/api/friends/add',{
                 email:validatedEmail.email,
             })
-            setShowSuccessState(false)
+            setShowSuccessState(true)
         }catch (e) {
             if(e instanceof z.ZodError){
                 setError("email",{message:e.message})
