@@ -39,6 +39,7 @@ const AddFriendButton: React.FC<AddFriendButtonProps> = function () {
             })
             setShowSuccessState(true)
         }catch (e) {
+            setShowSuccessState(false)
             if(e instanceof z.ZodError){
                 setError("email",{message:e.message})
                 return;
@@ -70,7 +71,7 @@ const AddFriendButton: React.FC<AddFriendButtonProps> = function () {
                 />
                 <Button>Add</Button>
             </div>
-            {showSuccessState?<p className={'mt-1 text-sm text-red-600'}>Friend request send!</p>:<p className={'mt-1 text-sm text-green-600'}>{errors.email?.message}</p>}
+            {showSuccessState?<p className={'mt-1 text-sm text-green-600'}>Friend request send!</p>:<p className={'mt-1 text-sm text-green-600'}>{errors.email?.message}</p>}
 
         </form>
     );

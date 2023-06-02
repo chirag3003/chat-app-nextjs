@@ -10,6 +10,8 @@ import {RedirectType} from "next/dist/client/components/redirect";
 import FriendRequestSidebarOption from "@/components/FriendRequestSidebarOption";
 import {fetchRedis} from "@/helpers/redis";
 import {UserId} from "@/types/next-auth";
+import {getFriendsByUserId} from "@/helpers/getFriendsByUserId";
+import SidebarChatList from "@/components/SidebarChatList";
 
 interface LayoutProps {
     children: ReactNode,
@@ -35,9 +37,8 @@ const Layout = async ({children}: LayoutProps) => {
     if (!session) {
         redirect("/login", RedirectType.replace)
     }
-
-    const unseenRequestCount =(( await fetchRedis("smembers",`user:${session.user.id}:incoming_friend_requests`)) as UserId[]).length
-    console.log(unseenRequestCount)
+    const friends = await getFriendsByUserId(session.user.id)
+    const unseenRequestCount = ((await fetchRedis("smembers", `user:${session.user.id}:incoming_friend_requests`)) as UserId[]).length
 
     return (
         <div className={'w-full flex h-screen'}>
@@ -46,11 +47,15 @@ const Layout = async ({children}: LayoutProps) => {
                 <Link href={"/dashboard"} className={'flex h-16 shrink-0 items-center'}>
                     <Icons.Logo className={"h-8 w-auto text-indigo-600"}/>
                 </Link>
-                <div className="text-xs font-semibold leading-6 text-gray-400">
+
+                {friends.length > 0 ? <div className="text-xs font-semibold leading-6 text-gray-400">
                     Your Chats
-                </div>
+                </div> : null}
                 <nav className="flex flex-1 flex-col">
                     <ul role={"list"} className="flex flex-col flex-1">
+                        <li>
+                            <SidebarChatList friends={friends} sessionId={session.user.id} />
+                        </li>
                         <li>
                             <div className={"text-xs font-semibold leading-6 text-gray-600"}>Overview</div>
                             <ul role={"list"} className={"-mx-2 mt-2 space-y-1"}>
@@ -71,10 +76,11 @@ const Layout = async ({children}: LayoutProps) => {
                                         </li>
                                     )
                                 })}
+                                <li>
+                                    <FriendRequestSidebarOption sessionId={session.user.id}
+                                                                initialUnseenRequestCount={unseenRequestCount}/>
+                                </li>
                             </ul>
-                        </li>
-                        <li>
-                            <FriendRequestSidebarOption sessionId={session.user.id} initialUnseenRequestCount={unseenRequestCount}/>
                         </li>
                         <li className='absolute overflow-hidden left-0 right-0 bottom-0 max-w-sm mt-auto flex items-center py-3 px-6'>
                             <div
@@ -104,7 +110,7 @@ const Layout = async ({children}: LayoutProps) => {
 
                 </nav>
             </div>
-            <div className="grow-0">
+            <div className="flex-1 p-4">
                 {children}
             </div>
         </div>
