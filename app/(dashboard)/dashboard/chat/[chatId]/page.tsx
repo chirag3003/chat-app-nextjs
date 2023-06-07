@@ -6,6 +6,8 @@ import {RedirectType} from "next/dist/client/components/redirect";
 import {fetchRedis} from "@/helpers/redis";
 import {messageArrayValidator} from "@/lib/validations/message";
 import Image from "next/image";
+import Messages from "@/components/Messages";
+import ChatInput from "@/components/ChatInput";
 
 interface PageProps {
     params: {
@@ -15,7 +17,7 @@ interface PageProps {
 
 async function getChatMessages(chatId: string) {
     try {
-        const result: string[] = await fetchRedis("zrange", `chat:${chatId}:messages`, 0, -1)
+        const result: string[] = await fetchRedis("zrange", `chat:${chatId}`, 0, -1)
         const dbMessages = result.map((msg) => JSON.parse(msg))
         const reversedDbMessages = dbMessages.reverse()
         return messageArrayValidator.parse(reversedDbMessages)
@@ -34,7 +36,7 @@ const Page = async ({params: {chatId}}: PageProps) => {
     if (userId1 !== user.id && userId2 !== userId2) notFound()
     const chatPartnerId = userId1 === user.id ? userId2 : userId1
     const chatPartner = JSON.parse((await fetchRedis("get", `user:${chatPartnerId}`))) as User
-    console.log(chatPartner,'chat')
+    const messages = await getChatMessages(chatId)
     return (
         <div className={"flex flex-col justify-between flex-1 h-full max-h-[calc(100vh-6rem)]"}>
             <div className="flex sm:items-center justify-between py-3 border-b-2 border-gray-200">
@@ -52,6 +54,8 @@ const Page = async ({params: {chatId}}: PageProps) => {
                     </div>
                 </div>
             </div>
+            <Messages initialMessages={messages} sessionId={session.user.id} />
+            <ChatInput chatPartner={chatPartner} chatId={chatId}/>
         </div>
     );
 };

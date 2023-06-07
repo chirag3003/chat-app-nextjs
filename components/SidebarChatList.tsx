@@ -12,7 +12,6 @@ const SidebarChatList:React.FC<SidebarChatListProps> = ({friends,sessionId}) => 
     const router = useRouter()
     const pathname = usePathname()
     const [unseenMessages,setUnseenMessages] = useState<Message[]>([])
-    console.log(friends)
     useEffect(() => {
         if(pathname?.includes("chat")){
             setUnseenMessages(prev => {
