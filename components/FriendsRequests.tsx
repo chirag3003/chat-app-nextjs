@@ -1,10 +1,12 @@
 "use client"
 
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Check, Cross, Crosshair, UserPlus, X} from "lucide-react";
 import axios from "axios";
 import {useRouter} from "next/navigation";
 import toast from "react-hot-toast";
+import {pusherClient} from "@/lib/pusher";
+import {toPusherKey} from "@/lib/utils";
 
 interface FriendsRequestsProps{
     incomingFriendRequests:IncomingFriendRequest[];
@@ -40,6 +42,14 @@ const FriendsRequests = ({incomingFriendRequests,sessionId}:FriendsRequestsProps
             toast.error("Error denying friend request")
         }
     }
+
+    useEffect(() => {
+        pusherClient.subscribe(toPusherKey(`user:${sessionId}:incoming_friend_requests`))
+        pusherClient.bind("incoming_friend_request", (data:IncomingFriendRequest) => {
+
+        })
+    },[])
+
     return (
         <>
             {incomingFriendRequests.length === 0 ? <p>Nothing to Show here</p>:incomingFriendRequests.map((req) => {
