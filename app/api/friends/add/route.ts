@@ -5,6 +5,8 @@ import {getServerSession} from "next-auth";
 import {authOptions} from "@/lib/auth";
 import {db} from "@/lib/db";
 import {fetchRedis} from "@/helpers/redis";
+import {pusherServer} from "@/lib/pusher";
+import {toPusherKey} from "@/lib/utils";
 
 export async function POST(req: Request) {
     try {
@@ -28,6 +30,11 @@ export async function POST(req: Request) {
         if(isAlreadyAdded) return NextResponse.json("User already added",{status:400})
         const isAlreadyFriends = (await fetchRedis("sismember",`user:${session.user.id}:friends`,idToAdd)) as 0|1
         if(isAlreadyFriends) return NextResponse.json("Already Friends with this user",{status:400})
+
+        await pusherServer.trigger(toPusherKey(`user:${idToAdd}:incoming_friend_requests`), "incoming_friend_requests", {
+            senderId: session.user.id,
+            senderEmail:session.user.email,
+        })
 
         await db.sadd(`user:${idToAdd}:incoming_friend_requests`,session.user.id)
 

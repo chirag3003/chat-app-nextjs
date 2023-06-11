@@ -46,7 +46,9 @@ const FriendsRequests = ({incomingFriendRequests,sessionId}:FriendsRequestsProps
     useEffect(() => {
         pusherClient.subscribe(toPusherKey(`user:${sessionId}:incoming_friend_requests`))
         pusherClient.bind("incoming_friend_request", (data:IncomingFriendRequest) => {
-
+            setFriendsRequests(prev => {
+                return [...prev,data]
+            })
         })
     },[])
 
