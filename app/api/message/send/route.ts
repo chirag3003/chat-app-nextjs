@@ -4,6 +4,8 @@ import {fetchRedis} from "@/helpers/redis";
 import {db} from "@/lib/db";
 import {Message, messageValidator} from "@/lib/validations/message";
 import {nanoid} from "nanoid";
+import {pusherServer} from "@/lib/pusher";
+import {toPusherKey} from "@/lib/utils";
 
 export async function POST(req:Request){
     try{
@@ -30,6 +32,9 @@ export async function POST(req:Request){
             timestamp,
         }
         const message = messageValidator.parse(messageData)
+        console.log('atn')
+        await pusherServer.trigger(toPusherKey(`chat:${chatId}`),`incoming_message`,messageData)
+        console.log('here')
         await db.zadd(`chat:${chatId}`,{
             score:timestamp,
             member:JSON.stringify(message)

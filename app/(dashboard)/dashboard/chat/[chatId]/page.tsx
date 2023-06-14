@@ -43,7 +43,8 @@ const Page = async ({params: {chatId}}: PageProps) => {
                 <div className="relative flex items-center space-x-4">
                     <div className="relative">
                         <div className="relative w-8 sm:w-12 h-8 sm:h-12 rounded-full overflow-hidden">
-                            <Image fill referrerPolicy={"no-referrer"} src={chatPartner.image} alt={`${chatPartner.name} profile`} />
+                            <Image fill referrerPolicy={"no-referrer"} src={chatPartner.image}
+                                   alt={`${chatPartner.name} profile`}/>
                         </div>
                     </div>
                     <div className="flex flex-col leading-tight">
@@ -54,7 +55,8 @@ const Page = async ({params: {chatId}}: PageProps) => {
                     </div>
                 </div>
             </div>
-            <Messages initialMessages={messages} sessionId={session.user.id} sessionImage={(session.user.image) as string} chatPartner={chatPartner} />
+            <Messages chatId={chatId} initialMessages={messages} sessionId={session.user.id}
+                      sessionImage={(session.user.image) as string} chatPartner={chatPartner}/>
             <ChatInput chatPartner={chatPartner} chatId={chatId}/>
         </div>
     );

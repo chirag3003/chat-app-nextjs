@@ -1,25 +1,38 @@
 "use client"
 
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Message} from "@/lib/validations/message"
-import {cn} from "@/lib/utils";
+import {cn, toPusherKey} from "@/lib/utils";
 import {format} from "date-fns";
 import Image from "next/image";
+import {pusherClient} from "@/lib/pusher";
 
 interface MessageProps {
     initialMessages: Message[],
     sessionId: string,
     sessionImage: string,
-    chatPartner: User
+    chatPartner: User,
+    chatId:string,
 }
 
 const formatTimestamp = (timestamp: number) => {
     return format(timestamp, "HH:mm")
 }
 
-const Messages = ({initialMessages, sessionId, sessionImage, chatPartner}: MessageProps) => {
+const Messages = ({initialMessages, sessionId, sessionImage, chatPartner,chatId}: MessageProps) => {
     const [messages, setMessages] = useState<Message[]>(initialMessages)
     const scrollDownRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        pusherClient.subscribe(toPusherKey(`chat:${chatId}`))
+        pusherClient.bind("incoming_message", (data:Message) => {
+            console.log(typeof data)
+            setMessages(prev => {
+                return [data,...prev]
+            })
+        })
+    },[])
+
     return (
         <div
             id={"messages"}
