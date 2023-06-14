@@ -30,7 +30,7 @@ export async function POST(req: Request) {
         if(isAlreadyAdded) return NextResponse.json("User already added",{status:400})
         const isAlreadyFriends = (await fetchRedis("sismember",`user:${session.user.id}:friends`,idToAdd)) as 0|1
         if(isAlreadyFriends) return NextResponse.json("Already Friends with this user",{status:400})
-
+        console.log('here')
         await pusherServer.trigger(toPusherKey(`user:${idToAdd}:incoming_friend_requests`), "incoming_friend_requests", {
             senderId: session.user.id,
             senderEmail:session.user.email,

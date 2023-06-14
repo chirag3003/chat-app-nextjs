@@ -45,7 +45,8 @@ const FriendsRequests = ({incomingFriendRequests,sessionId}:FriendsRequestsProps
 
     useEffect(() => {
         pusherClient.subscribe(toPusherKey(`user:${sessionId}:incoming_friend_requests`))
-        pusherClient.bind("incoming_friend_request", (data:IncomingFriendRequest) => {
+        pusherClient.bind("incoming_friend_requests", (data:IncomingFriendRequest) => {
+            console.log(typeof data)
             setFriendsRequests(prev => {
                 return [...prev,data]
             })
@@ -54,7 +55,7 @@ const FriendsRequests = ({incomingFriendRequests,sessionId}:FriendsRequestsProps
 
     return (
         <>
-            {incomingFriendRequests.length === 0 ? <p>Nothing to Show here</p>:incomingFriendRequests.map((req) => {
+            {friendsRequests.length === 0 ? <p>Nothing to Show here</p>:friendsRequests.map((req) => {
                 return <div
                     key={req.senderId}
                     className={"flex gap-4 items-center"}
