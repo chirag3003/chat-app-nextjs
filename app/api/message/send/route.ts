@@ -32,9 +32,12 @@ export async function POST(req:Request){
             timestamp,
         }
         const message = messageValidator.parse(messageData)
-        console.log('atn')
-        await pusherServer.trigger(toPusherKey(`chat:${chatId}`),`incoming_message`,messageData)
-        console.log('here')
+        pusherServer.trigger(toPusherKey(`chat:${chatId}`),`incoming_message`,messageData)
+        pusherServer.trigger(toPusherKey(`user:${friendId}:chats`),"new_message", {
+            ...messageData,
+            senderImg:sender.image,
+            senderName:sender.name
+        })
         await db.zadd(`chat:${chatId}`,{
             score:timestamp,
             member:JSON.stringify(message)

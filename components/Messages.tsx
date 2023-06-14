@@ -26,7 +26,6 @@ const Messages = ({initialMessages, sessionId, sessionImage, chatPartner,chatId}
     useEffect(() => {
         pusherClient.subscribe(toPusherKey(`chat:${chatId}`))
         pusherClient.bind("incoming_message", (data:Message) => {
-            console.log(typeof data)
             setMessages(prev => {
                 return [data,...prev]
             })
