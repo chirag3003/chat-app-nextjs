@@ -5,6 +5,9 @@ import {usePathname, useRouter} from "next/navigation";
 import {chatHrefConstructor, toPusherKey} from "@/lib/utils";
 import {User2, UserCircle} from "lucide-react";
 import {pusherClient} from "@/lib/pusher";
+import toast from "react-hot-toast";
+import UnseenChatToast from "@/components/UnseenChatToast";
+import messages from "@/components/Messages";
 
 interface SidebarChatListProps {
     friends: User[]
@@ -21,7 +24,14 @@ const SidebarChatList: React.FC<SidebarChatListProps> = ({friends, sessionId}) =
     const pathname = usePathname()
     const [unseenMessages, setUnseenMessages] = useState<Message[]>([])
     const chatHandler = (message:ExtendedMessage) => {
-        console.log(message)
+        const shouldNotify = pathname !== `/dashboard/chat/${chatHrefConstructor(sessionId,message.senderId)}`
+        if(!shouldNotify) return;
+
+        //should be notified
+        toast.custom((t) => {
+            return <UnseenChatToast senderId={message.senderId} senderImg={message.senderImg} sessionId={sessionId}  t={t} senderName={message.senderName} message={message.text}/>
+        })
+        setUnseenMessages(prev => [...prev,message])
     }
     const newFriendHandler = () => {
         router.refresh()
