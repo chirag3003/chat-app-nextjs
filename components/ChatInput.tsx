@@ -8,23 +8,24 @@ import toast from "react-hot-toast";
 
 interface ChatInputProps {
     chatPartner: User,
-    chatId:string
+    chatId: string
 }
 
-const ChatInput = ({chatPartner,chatId}: ChatInputProps) => {
+const ChatInput = ({chatPartner, chatId}: ChatInputProps) => {
     const textAreaRef = useRef<HTMLTextAreaElement>(null)
     const [input, setInput] = useState("")
-    const [isLoading,setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const sendMessage = async () => {
+        if (!input) return;
         setIsLoading(true)
-        try{
-            await axios.post("/api/message/send",{text:input,chatId})
+        try {
+            await axios.post("/api/message/send", {text: input, chatId})
             setInput("")
             textAreaRef.current?.focus()
-        }catch (err){
+        } catch (err) {
             console.error(err)
             toast.error("Something went wrong. Please try again later.")
-        }finally {
+        } finally {
             setIsLoading(false)
         }
     }
