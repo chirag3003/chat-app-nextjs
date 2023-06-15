@@ -42,10 +42,12 @@ const SidebarChatList: React.FC<SidebarChatListProps> = ({friends, sessionId}) =
         pusherClient.bind('new_message', chatHandler)
         pusherClient.bind('new_friend', newFriendHandler)
         return () => {
+            pusherClient.unbind("new_message", chatHandler)
+            pusherClient.unbind("new_friend", newFriendHandler)
             pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:chats`))
             pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:friends`))
         }
-    }, [sessionId])
+    }, [chatHandler, newFriendHandler, sessionId,pathname])
     useEffect(() => {
         if (pathname?.includes("chat")) {
             setUnseenMessages(prev => {
