@@ -1,11 +1,11 @@
-import Image from 'next/image'
-import Button from "@/components/ui/Buttton"
-import {db} from "@/lib/db";
+import {getServerSession} from "next-auth";
+import {authOptions} from "@/lib/auth";
+import {redirect} from "next/navigation";
+import {RedirectType} from "next/dist/client/components/redirect";
 
-export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-        <Button variant={"default"}>hello</Button>
-    </main>
-  )
+export default async function Home() {
+
+    const session = await getServerSession(authOptions)
+    if (session) return redirect("/dashboard", RedirectType.replace)
+    return redirect("/login", RedirectType.replace)
 }
