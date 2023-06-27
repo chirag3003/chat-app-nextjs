@@ -13,6 +13,7 @@ import {UserId} from "@/types/next-auth";
 import {getFriendsByUserId} from "@/helpers/getFriendsByUserId";
 import SidebarChatList from "@/components/SidebarChatList";
 import MobileChatLayout from "@/components/MobileChatLayout";
+import {Github} from "lucide-react";
 
 interface LayoutProps {
     children: ReactNode,
@@ -44,21 +45,27 @@ const Layout = async ({children}: LayoutProps) => {
     return (
         <div className={'w-full flex h-screen'}>
             <div className="md:hidden">
-                <MobileChatLayout friends={friends} session={session} sidebarOptions={sidebarOptions} unseenRequestCount={unseenRequestCount} />
+                <MobileChatLayout friends={friends} session={session} sidebarOptions={sidebarOptions}
+                                  unseenRequestCount={unseenRequestCount}/>
             </div>
             <div
                 className="hidden md:flex relative  h-full w-full max-w-xs grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white leading-6 p-6">
-                <Link href={"/dashboard"} className={'flex h-16 shrink-0 items-center'}>
-                    <Icons.Logo className={"h-8 w-auto text-indigo-600"}/>
-                </Link>
-
+                <div className="flex gap-4 items-center">
+                    <Link href={"/dashboard"} className={'flex h-16 shrink-0 items-center'}>
+                        <Icons.Logo className={"h-8 w-auto text-indigo-600"}/>
+                    </Link>
+                    <Link href={"https://github.com/chirag3003"} target={"_blank"} referrerPolicy={"no-referrer"}
+                          className={'flex h-16 shrink-0 items-center'}>
+                        <Github className={"h-8 w-auto "}/>
+                    </Link>
+                </div>
                 {friends.length > 0 ? <div className="text-xs font-semibold leading-6 text-gray-400">
                     Your Chats
                 </div> : null}
                 <nav className="flex flex-1 flex-col">
                     <ul role={"list"} className="flex flex-col flex-1">
                         <li>
-                            <SidebarChatList friends={friends} sessionId={session.user.id} />
+                            <SidebarChatList friends={friends} sessionId={session.user.id}/>
                         </li>
                         <li>
                             <div className={"text-xs font-semibold leading-6 text-gray-600"}>Overview</div>
