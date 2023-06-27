@@ -7,45 +7,45 @@ import {nanoid} from "nanoid";
 import {pusherServer} from "@/lib/pusher";
 import {toPusherKey} from "@/lib/utils";
 
-export async function POST(req:Request){
-    try{
-        const {text,chatId} = await req.json()
+export async function POST(req: Request) {
+    try {
+        const {text, chatId} = await req.json()
         const session = await getServerSession(authOptions)
-        if(!session) return new Response("Unauthorized", {status: 401})
+        if (!session) return new Response("Unauthorized", {status: 401})
         const {user} = session
-        const [userId1,userId2] = chatId.split("--")
+        const [userId1, userId2] = chatId.split("--")
 
 
-        if(session.user.id !== userId1 && session.user.id !== userId2) return new Response("Unauthorized", {status: 401})
-        const friendId = session.user.id===userId1?userId2:userId1
-        const friendList:string[] = await fetchRedis("smembers",`user:${user.id}:friends`)
+        if (session.user.id !== userId1 && session.user.id !== userId2) return new Response("Unauthorized", {status: 401})
+        const friendId = session.user.id === userId1 ? userId2 : userId1
+        const friendList: string[] = await fetchRedis("smembers", `user:${user.id}:friends`)
         const isFriend = friendList.includes(friendId)
 
-        if(!isFriend) return new Response("Unauthorized", {status: 401})
-        const sender:User = JSON.parse(await fetchRedis("get",`user:${user.id}`))
+        if (!isFriend) return new Response("Unauthorized", {status: 401})
+        const sender: User = JSON.parse(await fetchRedis("get", `user:${user.id}`))
 
         const timestamp = Date.now()
-        const messageData :Message = {
-            id:nanoid(),
-            senderId:user.id,
+        const messageData: Message = {
+            id: nanoid(),
+            senderId: user.id,
             text,
             timestamp,
         }
         const message = messageValidator.parse(messageData)
-        pusherServer.trigger(toPusherKey(`chat:${chatId}`),`incoming_message`,messageData)
-        pusherServer.trigger(toPusherKey(`user:${friendId}:chats`),"new_message", {
-            ...messageData,
-            senderImg:sender.image,
-            senderName:sender.name
-        })
-        await db.zadd(`chat:${chatId}`,{
-            score:timestamp,
-            member:JSON.stringify(message)
-        })
+        await Promise.all([pusherServer.trigger(toPusherKey(`chat:${chatId}`), `incoming_message`, messageData),
+            pusherServer.trigger(toPusherKey(`user:${friendId}:chats`), "new_message", {
+                ...messageData,
+                senderImg: sender.image,
+                senderName: sender.name
+            }),
+            db.zadd(`chat:${chatId}`, {
+                score: timestamp,
+                member: JSON.stringify(message)
+            })])
 
         return new Response("OK")
-    }catch (e){
-        if(e instanceof Error){
+    } catch (e) {
+        if (e instanceof Error) {
             return new Response(e.message, {status: 500})
         }
         return new Response("Internal Server Error", {status: 500})
